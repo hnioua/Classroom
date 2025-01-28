@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generate Excel File</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <button id="generateExcel">Download Excel</button>
+
+    <script>
+      document
+        .getElementById("generateExcel")
+        .addEventListener("click", function () {
+          // Define the data for the Excel file
+          const data = [
+            ["رتب", "الإسم الكامل", "الجنس", "النقطة"], // Headers
+            [1, "", "M", "0,00"],
+            [2, "", "F", ""],
+            [3, "", "", ""],
+            [4, "", "", ""],
+            [5, "", "", ""],
+            [6, "", "", ""],
+            [7, "", "", ""],
+            [8, "", "", ""],
+            [9, "", "", ""],
+            [10, "", "", ""],
+            [11, "", "", ""],
+            [12, "", "", ""],
+            [13, "", "", ""],
+            [14, "", "", ""],
+            [15, "", "", ""],
+          ];
+
+          // Create a workbook and a worksheet
+          const workbook = XLSX.utils.book_new();
+          const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+          // Adjust column widths
+          worksheet["!cols"] = [
+            { wch: 5 }, // Column for "رتب"
+            { wch: 20 }, // Column for "الإسم الكامل"
+            { wch: 10 }, // Column for "الجنس"
+            { wch: 10 }, // Column for "النقطة"
+          ];
+
+          // Add the worksheet to the workbook
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Tableau");
+
+          // Generate the Excel file and trigger download
+          XLSX.writeFile(workbook, "Tableau.xlsx");
+        });
+    </script>
+  </body>
+</html>

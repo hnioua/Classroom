@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Schéma de Classe SVT</title>
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Salle de Classe SVT</h1>
+      </header>
+
+      <h1>Excel File Viewer</h1>
+      <div class="file-input">
+        <input type="file" id="fileInput" accept=".xlsx, .xls" />
+      </div>
+
+      <table id="excelTable">
+        <thead>
+          <tr id="tableHeader"></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <h2>Tableau complet des étudiants</h2>
+      <table id="notesTable">
+        <thead>
+          <tr>
+            <th>Rang</th>
+            <th>Nom</th>
+            <th>Note</th>
+            <th>Sexe</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+
+      <table id="statsTable">
+        <thead>
+          <tr>
+            <th>Moyenne</th>
+            <th>Médiane</th>
+            <th>Min</th>
+            <th>Max</th>
+            <th>Variance</th>
+            <th>Écart-Type</th>
+          </tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+      </table>
+      <button id="saveButton">Save</button>
+
+      <section id="classroom" class="classroom"></section>
+
+      <footer>
+        <p>&copy; 2025 - Schéma de classe SVT</p>
+      </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js" defer></script>
+
+    <script>
+      function tableToSheet(tableId) {
+        const table = document.getElementById(tableId);
+        const rows = table.querySelectorAll("tr");
+        const data = [];
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("th, td");
+          const rowData = [];
+          cells.forEach((cell) => rowData.push(cell.innerText));
+          data.push(rowData);
+        });
+        return XLSX.utils.aoa_to_sheet(data);
+      }
+
+      function saveExcel() {
+        const workbook = XLSX.utils.book_new();
+
+        // Convert notesTable to a worksheet and append to workbook
+        const notesSheet = tableToSheet("notesTable");
+        workbook.SheetNames.push("Notes Table");
+        workbook.Sheets["Notes Table"] = notesSheet;
+
+        // Convert statsTable to a worksheet and append to workbook
+        const statsSheet = tableToSheet("statsTable");
+        workbook.SheetNames.push("Stats Table");
+        workbook.Sheets["Stats Table"] = statsSheet;
+
+        // Add borders and styles (optional)
+        const applyStyles = (sheet) => {
+          const range = XLSX.utils.decode_range(sheet["!ref"]);
+          for (let row = range.s.r; row <= range.e.r; row++) {
+            for (let col = range.s.c; col <= range.e.c; col++) {
+              const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+              if (!sheet[cellAddress]) continue;
+              if (!sheet[cellAddress].s) sheet[cellAddress].s = {};
+              sheet[cellAddress].s.border = {
+                top: { style: "thin", color: { rgb: "000000" } },
+                bottom: { style: "thin", color: { rgb: "000000" } },
+                left: { style: "thin", color: { rgb: "000000" } },
+                right: { style: "thin", color: { rgb: "000000" } },
+              };
+            }
+          }
+        };
+
+        applyStyles(notesSheet);
+        applyStyles(statsSheet);
+
+        // Save the workbook as an Excel file
+        XLSX.writeFile(workbook, "Tables_Export.xlsx");
+      }
+
+      document
+        .getElementById("saveButton")
+        .addEventListener("click", saveExcel);
+    </script>
+  </body>
+</html>
